@@ -2,38 +2,46 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Planit — Plan your world</title>
 
-    <link rel="icon" type="image/png" href="./assets/logos/planit-logo.png">
-    <link rel="shortcut icon" href="./assets/logos/planit-logo.png">
+    <link rel="icon" type="image/png" href="./assets/logos/planit-logo.png?v=6.0">
+    <link rel="shortcut icon" href="./assets/logos/planit-logo.png?v=6.0">
+    <link rel="apple-touch-icon" href="./assets/logos/planit-logo.png?v=6.0">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-    
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
-    <header class="navbar">
+    <header class="navbar" id="global-nav">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="./index.html" class="brand-link">
-                    <img src="./assets/logos/Planit-Logo-White.png" alt="Planit" class="nav-logo">
-                </a>
+                <div class="dropdown brand-dropdown">
+                    <a href="./index.html" class="brand-link">
+                        <img src="./assets/logos/Planit-Logo-White.png" alt="Planit" class="nav-logo">
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="./download/index.html">설치</a></li>
+                        <li><a href="./about/index.html">About us</a></li>
+                        <hr class="divider">
+                        <li><a href="./velora/index.html" class="studio-link">Velora Studio</a></li>
+                    </ul>
+                </div>
             </div>
 
             <div class="nav-right">
-                <div class="desktop-menu desktop-only">
-                    <div class="dropdown">
-                        <button class="nav-btn">Community</button>
-                        <ul class="dropdown-menu">
+                <nav class="desktop-menu-group desktop-only">
+                    <div class="dropdown community-dropdown">
+                        <button class="nav-txt-btn">Community</button>
+                        <ul class="dropdown-menu align-right">
                             <li><a href="./community/notice/index.html">공지사항</a></li>
                             <li><a href="./community/free/index.html">자유게시판</a></li>
                             <li><a href="./community/bug/index.html">버그신고</a></li>
                         </ul>
                     </div>
                     <div class="dropdown auth-dropdown">
-                        <button class="icon-btn-auth" aria-label="Account">
+                        <button class="icon-auth-btn" aria-label="Account">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </button>
                         <ul class="dropdown-menu align-right">
@@ -41,10 +49,10 @@
                             <li><a href="./signup/index.html">회원가입</a></li>
                         </ul>
                     </div>
-                </div>
+                </nav>
 
-                <button class="hamburger" id="mobile-toggle" aria-label="메뉴 열기">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                <button class="hamburger-btn" id="menu-toggle" aria-label="Menu">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
                         <line x1="3" y1="12" x2="21" y2="12"></line>
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -54,37 +62,49 @@
         </div>
     </header>
 
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="./assets/logos/planit-logo.png" alt="Planit" class="nav-logo-sm">
-            <button class="close-btn" id="sidebar-close">&times;</button>
-        </div>
-        <nav class="sidebar-content">
-            <a href="./about/index.html" class="sidebar-link">About us</a>
-            <a href="./download/index.html" class="sidebar-link">설치</a>
-            <hr class="sidebar-divider">
-            <div class="sidebar-accordion">
-                <button class="accordion-trigger">Community</button>
-                <div class="accordion-body">
-                    <a href="./community/notice/index.html">공지사항</a>
-                    <a href="./community/free/index.html">자유게시판</a>
-                    <a href="./community/bug/index.html">버그신고</a>
-                </div>
+    <aside class="sidebar" id="mobile-sidebar">
+        <div class="sidebar-inner">
+            <div class="sidebar-top">
+                <img src="./assets/logos/Planit-Logo-White.png" alt="Planit" class="nav-logo-sm">
+                <button class="close-btn" id="menu-close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            <hr class="sidebar-divider">
-            <a href="./login/index.html" class="sidebar-link">로그인</a>
-            <a href="./signup/index.html" class="sidebar-link highlight">회원가입</a>
-        </nav>
+            <nav class="sidebar-links">
+                <div class="nav-section">
+                    <a href="./download/index.html" class="s-link">설치</a>
+                    <a href="./about/index.html" class="s-link">About us</a>
+                    <a href="./velora/index.html" class="s-link studio-accent">Velora Studio</a>
+                </div>
+                <div class="nav-section accordion-item">
+                    <button class="s-link accordion-trigger" id="mobile-comm-trigger">
+                        Community
+                        <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="accordion-content" id="mobile-comm-content">
+                        <a href="./community/notice/index.html" class="s-link sub">공지사항</a>
+                        <a href="./community/free/index.html" class="s-link sub">자유게시판</a>
+                        <a href="./community/bug/index.html" class="s-link sub">버그신고</a>
+                    </div>
+                </div>
+                <div class="nav-section auth">
+                    <hr class="divider">
+                    <a href="./login/index.html" class="s-link">로그인</a>
+                    <a href="./signup/index.html" class="s-link primary-accent">회원가입</a>
+                </div>
+            </nav>
+        </div>
     </aside>
-    <div class="overlay" id="overlay"></div>
+    <div class="overlay" id="menu-overlay"></div>
 
     <main class="hero">
         <div class="hero-inner">
             <h1 class="hero-title">Plan your world</h1>
-            <p class="hero-subtitle">당신의 일정, 하나의 공간에서</p>
-            <div class="hero-cta">
-                <a href="./download/index.html" class="btn-primary">설치하기</a>
-            </div>
+            <p class="hero-desc">당신의 일정, 하나의 공간에서</p>
+            <a href="./download/index.html" class="btn-cta">설치하기</a>
         </div>
         <div class="bg-glow"></div>
     </main>
