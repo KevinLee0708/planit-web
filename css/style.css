@@ -1,4 +1,4 @@
-/* [Core] Variables & Base */
+/* --- [System] Root & Resets --- */
 :root {
     --bg: #030509;
     --fg: #ffffff;
@@ -6,7 +6,6 @@
     --accent: #00F0FF;
     --glass: rgba(10, 12, 18, 0.75);
     --border: rgba(255, 255, 255, 0.08);
-    --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -16,87 +15,89 @@ html, body {
     font-family: 'Pretendard', sans-serif;
 }
 
-/* [Layout] Navbar */
+/* --- [Desktop Navbar] --- */
 .navbar {
     position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
     width: 92%; max-width: 1200px; height: 64px;
     background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border); border-radius: 20px; z-index: 1000;
 }
+.nav-container { height: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; }
 
-.nav-container { height: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+/* [해결] 로고 크기 고정 (이미지 폭주 방지) */
+.nav-logo { height: 38px !important; width: auto !important; display: block; object-fit: contain; }
+.nav-logo-sm { height: 32px !important; width: auto !important; display: block; object-fit: contain; }
 
-/* 로고 이미지 크기 고정 */
-.nav-logo { height: 38px !important; width: auto !important; object-fit: contain; display: block; }
-.nav-logo-sm { height: 30px; width: auto; }
-
-/* Desktop Elements */
+/* Desktop Navigation Group */
 .nav-right { display: flex; align-items: center; gap: 24px; }
-.desktop-menu-group { display: flex; align-items: center; gap: 24px; }
+.desktop-only-group { display: flex; align-items: center; gap: 24px; }
 
-.nav-txt-btn { background: none; border: none; color: var(--gray); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: 0.2s; }
+.nav-txt-btn { background: none; border: none; color: var(--gray); font-size: 0.95rem; cursor: pointer; transition: 0.3s; }
 .nav-txt-btn:hover { color: #fff; }
+
+.cta-install-btn {
+    padding: 10px 22px; background: #fff; color: #000; border-radius: 12px;
+    font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: 0.3s;
+}
 
 .icon-auth-btn {
     width: 42px; height: 42px; border-radius: 50%; background: var(--border);
     border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
 
-/* Dropdown */
+/* --- [Dropdown] 로고 및 메뉴 드롭다운 복구 --- */
 .dropdown { position: relative; }
 .dropdown-menu {
-    position: absolute; top: calc(100% + 12px); left: 0; min-width: 180px;
-    background: rgba(13, 17, 23, 0.95); border: 1px solid var(--border);
+    position: absolute; top: calc(100% + 15px); left: 50%; transform: translateX(-50%) translateY(10px);
+    min-width: 180px; background: rgba(13, 17, 23, 0.98); border: 1px solid var(--border);
     border-radius: 14px; padding: 8px; list-style: none;
-    opacity: 0; visibility: hidden; transform: translateY(10px); transition: var(--transition);
+    opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 1100;
 }
-.dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+/* 호버 시 드롭다운 가시화 */
+.dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+/* 우측 정렬 드롭다운 */
+.align-right { left: auto !important; right: 0 !important; transform: translateY(10px) !important; }
+.dropdown:hover .align-right { transform: translateY(0) !important; }
+
 .dropdown-menu a { display: block; padding: 12px 16px; color: var(--gray); text-decoration: none; font-size: 0.9rem; border-radius: 10px; }
 .dropdown-menu a:hover { background: rgba(255,255,255,0.05); color: #fff; }
-.align-right { left: auto; right: 0; }
 
-.studio-link { color: var(--accent) !important; font-weight: 700; }
 .divider { border: 0; border-top: 1px solid var(--border); margin: 6px 8px; }
+.studio-link { color: var(--accent) !important; font-weight: 700; }
 
-/* [Mobile] 햄버거 버튼 */
+/* --- [Mobile] Responsive --- */
 .hamburger-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
 
-/* --- [Responsive] 768px 이하 --- */
 @media screen and (max-width: 768px) {
     .desktop-only { display: none !important; }
     .hamburger-btn { display: block !important; }
     .navbar { width: 94% !important; top: 10px !important; height: 58px !important; padding: 0 16px !important; }
     .nav-logo { height: 30px !important; }
-    .hero-title { font-size: 3rem !important; line-height: 1.1; letter-spacing: -2px; }
 }
 
-/* [Mobile] Sidebar */
+/* Sidebar & Accordion */
 .sidebar {
     position: fixed; top: 0; right: -100%; width: 300px; height: 100vh;
-    background: #0A0C12; z-index: 2000; padding: 40px 24px; transition: var(--transition);
+    background: #0A0C12; z-index: 2000; padding: 40px 24px; transition: 0.4s;
 }
 .sidebar.active { right: 0; }
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); opacity: 0; visibility: hidden; z-index: 1500; transition: var(--transition); }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); opacity: 0; visibility: hidden; z-index: 1500; transition: 0.4s; }
 .overlay.active { opacity: 1; visibility: visible; }
 
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-.close-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: var(--gray); cursor: pointer; transition: 0.3s; }
-.close-btn:hover { color: #fff; transform: rotate(90deg); }
+.sidebar-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.close-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: var(--gray); cursor: pointer; }
 
-.s-link { display: block; width: 100%; padding: 16px 0; color: #fff; text-decoration: none; font-size: 1.2rem; background: none; border: none; text-align: left; cursor: pointer; }
-.studio-accent { color: var(--accent) !important; font-weight: 700; border-bottom: 1px solid rgba(0, 240, 255, 0.1); }
-.primary-accent { color: var(--accent) !important; font-weight: 700; }
+.s-link { display: block; padding: 14px 0; color: #fff; text-decoration: none; font-size: 1.1rem; text-align: left; background: none; border: none; width: 100%; cursor: pointer; }
+.sub { padding: 10px 16px !important; color: var(--gray) !important; font-size: 0.95rem !important; }
+.studio-accent, .primary-accent { color: var(--accent) !important; font-weight: 700; }
 
-/* [Accordion] */
-.accordion-trigger { display: flex; justify-content: space-between; align-items: center; }
-.chevron-icon { transition: transform 0.3s; }
-.accordion-trigger.active .chevron-icon { transform: rotate(180deg); }
-.accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; display: flex; flex-direction: column; background: rgba(255,255,255,0.03); border-radius: 12px; }
-.s-link.sub { padding: 12px 16px; font-size: 1rem; color: var(--gray); font-weight: 400; }
+.accordion-content { max-height: 0; overflow: hidden; transition: 0.4s ease; background: rgba(255,255,255,0.03); border-radius: 8px; }
+.chevron-icon { transition: 0.3s; }
+.active .chevron-icon { transform: rotate(180deg); }
 
 /* Hero */
-.hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; }
-.hero-title { font-size: 5.5rem; font-weight: 800; letter-spacing: -3px; }
-.hero-desc { color: var(--gray); font-size: 1.25rem; margin: 24px 0 40px; }
-.btn-cta { background: #fff; color: #000; padding: 16px 48px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: var(--transition); }
-.bg-glow { position: absolute; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(0, 122, 255, 0.1) 0%, transparent 70%); top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -1; filter: blur(60px); }
+.hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+.hero-title { font-size: clamp(2.5rem, 8vw, 5.5rem); font-weight: 800; letter-spacing: -4px; }
+.btn-cta { display: inline-block; margin-top: 40px; background: #fff; color: #000; padding: 16px 48px; border-radius: 50px; text-decoration: none; font-weight: 700; }
