@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Planit — Registar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css?v=2026.final">
+</head>
+<body class="auth-page">
+
+    <div class="auth-bg-glow"></div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            
+            <div id="register-form-box">
+                <div class="auth-header">
+                    <a href="../index.html" class="auth-logo">Planit</a>
+                    <h1>Create Account</h1>
+                    <p>Planit의 프리미엄 플래닝 시스템을 시작하세요</p>
+                </div>
+                
+                <form id="register-form" class="auth-form">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="reg-email">이메일</label>
+                            <input type="email" id="reg-email" placeholder="name@example.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-nickname">닉네임</label>
+                            <input type="text" id="reg-nickname" placeholder="2자 이상" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="reg-password">비밀번호</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="reg-password" placeholder="6자 이상 입력" required>
+                            <button type="button" class="password-toggle-btn" data-target="reg-password" aria-label="비밀번호 보기">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="reg-password-confirm">비밀번호 확인</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="reg-password-confirm" placeholder="비밀번호 다시 입력" required>
+                            <button type="button" class="password-toggle-btn" data-target="reg-password-confirm" aria-label="비밀번호 보기">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit" id="btn-register">
+                        <span class="btn-text">가입 및 인증 메일 발송</span>
+                    </button>
+                </form>
+                
+                <div class="auth-footer">
+                    이미 계정이 있으신가요? <a href="../login/index.html">로그인</a>
+                </div>
+            </div>
+
+            <div id="verification-pending-box" style="display: none;">
+                <div class="auth-header">
+                    <div class="verify-radar-container">
+                        <div class="radar-pulse"></div>
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#00F0FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </div>
+                    <h1 style="color: #ffffff; margin-top: 24px;">Verify your email</h1>
+                    <p id="target-verify-email" style="color: #00F0FF; font-weight: 700; margin-top: 6px; font-size: 0.95rem;"></p>
+                    
+                    <div class="verify-notice-card">
+                        <p>입력하신 메일함으로 보안 인증 링크를 전송했습니다.<br><strong>이메일 인증이 완료될 때까지 이 페이지를 유지해 주세요.</strong></p>
+                    </div>
+                </div>
+
+                <div class="auth-form" style="gap: 12px;">
+                    <button type="button" class="btn-auth-submit" id="btn-check-verified" style="background: #00F0FF; color: #030509;">
+                        인증 완료 확인
+                    </button>
+                    <button type="button" class="btn-auth-submit" id="btn-resend-email" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.08);">
+                        인증 메일 재발송
+                    </button>
+                </div>
+                
+                <div class="auth-footer" style="margin-top: 32px;">
+                    이메일을 잘못 입력하셨나요? <a href="#" id="btn-return-register">처음으로 돌아가기</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="../js/auth.js?v=2026.05.20"></script>
+</body>
+</html>

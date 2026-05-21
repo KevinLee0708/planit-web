@@ -1,0 +1,271 @@
+/**
+ * Planit Auth System Premium Design Specification
+ * Theme: Futuristic Minimalist & Glassmorphism
+ */
+
+.auth-page {
+    background-color: #030509;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* 프리미엄 무드를 만드는 백그라운드 발광 효과 */
+.auth-bg-glow {
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, rgba(3, 5, 9, 0) 70%);
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.auth-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 520px; /* 기존보다 확장된 필드를 수용하기 위한 최적 사이즈 */
+}
+
+/* Glassmorphic Auth Card */
+.auth-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 28px;
+    padding: 48px 40px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    animation: authCardFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authCardFadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.auth-logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: -1px;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.auth-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.auth-header p {
+    font-size: 0.9rem;
+    color: #8A919E;
+}
+
+/* Form Layout Components */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media screen and (max-width: 480px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .auth-card {
+        padding: 32px 24px;
+    }
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    color: #8A919E;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Premium Dark Input & Select */
+.input-group input,
+.input-group select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 13px 16px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: #00F0FF;
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+}
+
+/* Select Box 전용 스타일 커스텀 */
+.input-group select option {
+    background-color: #0d1117;
+    color: #ffffff;
+}
+
+/* Premium Submit CTA Button */
+.btn-auth-submit {
+    width: 100%;
+    padding: 15px;
+    background: #ffffff;
+    color: #030509;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-auth-submit:hover {
+    background: #00F0FF;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 240, 255, 0.2);
+}
+
+.btn-auth-submit:active {
+    transform: translateY(0);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 0.9rem;
+    color: #8A919E;
+}
+
+.auth-footer a {
+    color: #00F0FF;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    padding-right: 48px; /* 버튼 공간 확보 */
+}
+
+.password-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #8A919E;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+    color: #00F0FF; /* 호버 시 시그니처 린 칼라 하이라이트 */
+}
+
+/* 비밀번호가 보일 때 아이콘 색상 스위칭용 크로스 래퍼 */
+.password-toggle-btn.active {
+    color: #ffffff;
+}
+/* 이메일 인증 대기 세션 커스텀 디테일 */
+.verify-radar-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 240, 255, 0.05);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 감각적으로 퍼져나가는 고밀도 레이더 펄스 */
+.radar-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(0, 240, 255, 0.1);
+    animation: radarRipple 2s infinite ease-out;
+}
+
+@keyframes radarRipple {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+.verify-notice-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    text-align: center;
+}
+
+.verify-notice-card p {
+    font-size: 0.88rem;
+    color: #8A919E !important;
+    line-height: 1.6;
+}
+
+.verify-notice-card strong {
+    color: #ffffff;
+    font-weight: 600;
+}

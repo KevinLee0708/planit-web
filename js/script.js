@@ -1,66 +1,90 @@
+import { auth } from "./firebase.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. 주요 요소 셀렉터 (HTML ID와 일치 확인)
+    // 1. UI 요소 선택
     const toggle = document.getElementById('menu-toggle');
     const close = document.getElementById('menu-close');
     const sidebar = document.getElementById('mobile-sidebar');
     const overlay = document.getElementById('menu-overlay');
     const commTrigger = document.getElementById('mobile-comm-trigger');
     const commContent = document.getElementById('mobile-comm-content');
+    const authMenuList = document.getElementById('auth-menu-list');
+    const mobileAuthText = document.getElementById('mobile-auth-text');
 
-    /**
-     * 2. 사이드바 열기/닫기 로직
-     * @param {boolean} isOpen - 사이드바 상태
-     */
+    // 2. 사이드바 제어
     const handleMenu = (state) => {
-        if (!sidebar || !overlay) return; // 에러 방지용 가드 클로즈
-        
+        if(!sidebar || !overlay) return;
         sidebar.classList.toggle('active', state);
         overlay.classList.toggle('active', state);
-        
-        // 사이드바가 열려있을 때 뒷배경 스크롤 방지
         document.body.style.overflow = state ? 'hidden' : '';
     };
 
-    // 이벤트 리스너 안전하게 등록
     toggle?.addEventListener('click', () => handleMenu(true));
     close?.addEventListener('click', () => handleMenu(false));
     overlay?.addEventListener('click', () => handleMenu(false));
 
-    /**
-     * 3. 모바일 커뮤니티 아코디언 (상태 아이콘 회전 포함)
-     * CSS에서 .accordion-trigger.active .chevron { transform: rotate(90deg); } 가 필요합니다.
-     */
+    // 3. 모바일 아코디언 (커뮤니티 메뉴)
     commTrigger?.addEventListener('click', () => {
-        // active 클래스를 토글하여 화살표 방향 변경 (CSS 연동)
         const isActive = commTrigger.classList.toggle('active');
-        
-        if (isActive) {
-            // 열기: 내부 높이를 측정하여 부드럽게 펼침
-            commContent.style.maxHeight = commContent.scrollHeight + "px";
-        } else {
-            // 닫기
-            commContent.style.maxHeight = "0";
-        }
+        commContent.style.maxHeight = isActive ? commContent.scrollHeight + "px" : "0px";
     });
 
     /**
-     * 4. 데스크탑/모바일 공통 스크롤 효과
-     * 상단에서 40px 이상 내려오면 네비바 디자인 변경
+     * 4. Navbar Auth UI 업데이트 (실시간 상태 반영)
      */
-    const globalNav = document.getElementById('global-nav');
-    window.addEventListener('scroll', () => {
-        if (!globalNav) return;
+    const updateAuthUI = (user) => {
+        if (!authMenuList) return;
 
-        if (window.scrollY > 40) {
-            globalNav.style.width = '100%';
-            globalNav.style.top = '0';
-            globalNav.style.borderRadius = '0';
-            globalNav.style.background = 'rgba(2, 4, 8, 0.98)';
+        // 상대 경로 설정을 위해 (index.html 기준)
+        const pathPrefix = window.location.pathname.includes('/login/') || window.location.pathname.includes('/registar/') ? '../' : './';
+
+        if (user && user.emailVerified) {
+            // [로그인 상태]
+            const nickname = user.displayName || "사용자";
+            if (mobileAuthText) mobileAuthText.innerText = nickname;
+
+            authMenuList.innerHTML = `
+                <li class="menu-status">${nickname}님 환영합니다</li>
+                <hr class="divider">
+                <li><a href="#" id="btn-logout">로그아웃</a></li>
+                <li><a href="${pathPrefix}account/index.html">내 계정</a></li>
+            `;
+
+            document.getElementById('btn-logout')?.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await signOut(auth);
+                localStorage.removeItem("planit-token");
+                location.reload();
+            });
         } else {
-            globalNav.style.width = '92%';
-            globalNav.style.top = '15px';
-            globalNav.style.borderRadius = '20px';
-            globalNav.style.background = 'rgba(10, 12, 18, 0.75)';
+            // [로그아웃 상태]
+            if (mobileAuthText) mobileAuthText.innerText = "로그인해주세요";
+
+            authMenuList.innerHTML = `
+                <li class="menu-status">로그인이 필요합니다</li>
+                <hr class="divider">
+                <li><a href="${pathPrefix}login/index.html">로그인</a></li>
+                <li><a href="${pathPrefix}registar/index.html">회원가입</a></li>
+            `;
+        }
+    };
+
+    // Firebase 인증 상태 관찰자 실행
+    onAuthStateChanged(auth, (user) => {
+        updateAuthUI(user);
+    });
+
+    // 5. 스크롤 네비바 효과
+    window.addEventListener('scroll', () => {
+        const nav = document.getElementById('global-nav');
+        if (!nav) return;
+        if (window.scrollY > 40) {
+            nav.style.width = '100%'; nav.style.top = '0'; nav.style.borderRadius = '0';
+            nav.style.background = 'rgba(2, 4, 8, 0.98)';
+        } else {
+            nav.style.width = '92%'; nav.style.top = '15px'; nav.style.borderRadius = '20px';
+            nav.style.background = 'var(--glass)';
         }
     }, { passive: true });
 });

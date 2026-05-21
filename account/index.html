@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>계정 설정 — Planit</title>
+
+    <link rel="icon" type="image/png" href="../assets/logos/planit-logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    
+    <link rel="stylesheet" href="../css/style.css?v=20260521">
+    <link rel="stylesheet" href="../css/navbar.css?v=20260521">
+    <link rel="stylesheet" href="../css/account.css?v=20260521">
+    <link rel="stylesheet" href="../css/notifications.css?v=20260521">
+</head>
+<body>
+
+    <header class="navbar" id="global-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="dropdown brand-dropdown">
+                    <a href="../index.html" class="brand-link">
+                        <img src="../assets/logos/planit-logo.png" alt="Planit" class="nav-logo">
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../download/index.html">설치</a></li>
+                        <li><a href="../about/index.html">About us</a></li>
+                        <hr class="divider">
+                        <li><a href="../velora/index.html" class="studio-link">Velora Studio</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="nav-right">
+                <nav class="desktop-only-group desktop-only">
+                    <div class="dropdown">
+                        <button class="nav-txt-btn">COMMUNITY</button>
+                        <ul class="dropdown-menu align-right">
+                            <li><a href="../community/notice/index.html">공지사항</a></li>
+                            <li><a href="../community/free/index.html">자유게시판</a></li>
+                            <li><a href="../community/chat/index.html" class="support-link">1:1 CHAT</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown devlog-dropdown">
+                        <button class="nav-txt-btn devlog-btn">DEVLOG</button>
+                        <ul class="dropdown-menu align-right">
+                            <li><a href="../devlog/update/index.html">Update Log</a></li>
+                            <li><a href="../devlog/bug-report/index.html">버그 신고</a></li>
+                        </ul>
+                    </div>
+                    
+                    <a href="../download/index.html" class="cta-install-btn">웹버전 사용하기</a>
+
+                    <div class="noti-wrapper" id="notification-wrapper" style="position: relative; display: inline-flex; align-items: center; justify-content: center;">
+                        <button class="noti-trigger-btn" id="noti-trigger" aria-label="알림 열기" type="button" style="background: transparent !important; border: none !important; outline: none !important; padding: 8px !important; margin: 0 !important; cursor: pointer; display: flex !important; align-items: center; justify-content: center; position: relative !important;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ffffff !important;">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span class="noti-badge" id="noti-badge-count" style="position: absolute !important; top: 2px !important; right: 2px !important; transform: translate(20%, -20%) !important; background: #FF4B4B !important; color: #ffffff !important; font-size: 10px !important; font-weight: 700 !important; padding: 2px 5px !important; border-radius: 10px !important; min-width: 14px !important; text-align: center !important; line-height: 1 !important; border: 1.5px solid #0b0f17 !important; box-sizing: border-box !important; display: inline-block !important;">0</span>
+                        </button>
+                        
+                        <div class="noti-dropdown" id="noti-dropdown-layer" style="position: absolute !important; top: 100% !important; right: 0 !important; width: 320px !important; margin-top: 12px !important; padding: 16px !important; box-sizing: border-box !important; background: rgba(13, 19, 30, 0.96) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; border-radius: 12px !important; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important; z-index: 9999 !important; display: none;">
+                            <div class="noti-header" style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding-bottom: 12px !important; margin-bottom: 12px !important; border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;">
+                                <span class="noti-title" style="color: #ffffff !important; font-size: 0.9rem !important; font-weight: 700 !important; letter-spacing: -0.02em !important;">최신 알림</span>
+                                <button type="button" class="noti-clear-all-btn" id="noti-clear-all" style="background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; color: #8A919E !important; font-size: 0.75rem !important; font-weight: 600 !important; padding: 4px 10px !important; border-radius: 6px !important; cursor: pointer !important;">모두 읽음</button>
+                            </div>
+                            <ul class="noti-list" id="noti-list-container" style="list-style: none !important; padding: 0 !important; margin: 0 !important; max-height: 260px; overflow-y: auto;">
+                                <li class="noti-empty" id="noti-empty-state" style="color: #626975 !important; font-size: 0.85rem !important; text-align: center !important; padding: 32px 0 !important; font-weight: 500 !important;">새로운 알림이 없습니다.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="dropdown auth-dropdown">
+                        <button class="icon-auth-btn" id="auth-trigger-btn" aria-label="계정 메뉴">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu align-right" id="auth-menu-list">
+                        </ul>
+                    </div>
+                </nav>
+
+                <button class="hamburger-btn" id="menu-toggle" aria-label="메뉴 열기">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <aside class="sidebar" id="mobile-sidebar">
+        <div class="sidebar-inner">
+            <div class="sidebar-top">
+                <img src="../assets/logos/planit-logo.png" alt="Planit" class="nav-logo-sm">
+                <button class="close-btn" id="menu-close" aria-label="메뉴 닫기">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <nav class="sidebar-links">
+                <a href="../download/index.html" class="s-link">설치</a>
+                <a href="../about/index.html" class="s-link">About us</a>
+                <a href="../velora/index.html" class="s-link studio-accent">Velora Studio</a>
+                
+                <div class="nav-section">
+                    <button class="s-link accordion-trigger" id="m-trigger-community">
+                        COMMUNITY
+                        <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                    <div class="accordion-content" id="m-content-community">
+                        <a href="../community/notice/index.html" class="s-link sub">공지사항</a>
+                        <a href="../community/free/index.html" class="s-link sub">자유게시판</a>
+                        <a href="../community/chat/index.html" class="s-link sub support-highlight">1:1 CHAT</a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <button class="s-link accordion-trigger" id="m-trigger-devlog">
+                        DEVLOG
+                        <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                    <div class="accordion-content" id="m-content-devlog">
+                        <a href="../devlog/update/index.html" class="s-link sub">Update Log</a>
+                        <a href="../devlog/bug-report/index.html" class="s-link sub">버그 신고</a>
+                    </div>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <hr class="divider">
+                    <div id="mobile-sidebar-auth-wrapper">
+                        <div class="mobile-user-info" style="display: flex; align-items: center; gap: 8px; padding: 10px 0; color: #ffffff; font-weight: 600;">
+                            <svg class="account-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00F0FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span id="mobile-user-nickname"></span>
+                        </div>
+                        <hr class="divider" style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.08); margin: 6px 0;">
+                        <button type="button" class="s-logout-btn" style="background: none; border: none; color: #FF4B4B; font-weight: 700; padding: 10px 0; width: 100%; text-align: left; cursor: pointer;">로그아웃</button>
+                        <a href="../account/index.html" class="s-account-link" style="display: block; color: #8A919E; text-decoration: none; padding: 10px 0; font-size: 0.95rem;">계정</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </aside>
+    <div class="overlay" id="menu-overlay"></div>
+
+    <main class="account-container">
+        <header class="account-page-header">
+            <h1 class="page-title">계정 설정</h1>
+            <p class="page-subtitle">보안 서약 변경 및 프로필 자격 증명을 실시간 관리합니다.</p>
+        </header>
+
+        <section class="settings-card">
+            <h2 class="card-headline">프로필 설정</h2>
+            <form id="form-update-profile" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="input-current-nickname">현재 닉네임</label>
+                    <input type="text" id="input-current-nickname" class="form-input field-readonly" readonly value="불러오는 중...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="input-new-nickname">새 닉네임 입력</label>
+                    <input type="text" id="input-new-nickname" class="form-input" placeholder="변경할 닉네임을 입력하세요" required>
+                </div>
+                <div class="action-bar">
+                    <button type="submit" class="btn-primary" id="btn-submit-profile">프로필 변경 저장</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="settings-card">
+            <h2 class="card-headline">이메일 주소</h2>
+            <form id="form-update-email" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="input-current-email">현재 연결된 이메일</label>
+                    <input type="email" id="input-current-email" class="form-input field-readonly" readonly value="불러오는 중...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="input-new-email">새 이메일 주소</label>
+                    <input type="email" id="input-new-email" class="form-input" placeholder="example@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email-current-password">현재 비밀번호 인증</label>
+                    <div style="position: relative; width: 100%;">
+                        <input type="password" id="email-current-password" class="form-input" placeholder="현재 비밀번호를 입력하세요" required style="padding-right: 60px;">
+                        <button type="button" class="pwd-toggle-btn" data-target="email-current-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #00F0FF; font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: 4px; z-index: 10;">보기</button>
+                    </div>
+                </div>
+                <div class="action-bar">
+                    <button type="submit" class="btn-primary" id="btn-submit-email">이메일 업데이트</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="settings-card">
+            <h2 class="card-headline">비밀번호 관리</h2>
+            <form id="form-update-password" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="input-current-password">현재 비밀번호</label>
+                    <div style="position: relative; width: 100%;">
+                        <input type="password" id="input-current-password" class="form-input" placeholder="현재 비밀번호 입력" required style="padding-right: 60px;">
+                        <button type="button" class="pwd-toggle-btn" data-target="input-current-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #00F0FF; font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: 4px; z-index: 10;">보기</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="input-new-password">새 비밀번호 설정</label>
+                    <div style="position: relative; width: 100%;">
+                        <input type="password" id="input-new-password" class="form-input" placeholder="최소 6자리 이상 구성" required style="padding-right: 60px;">
+                        <button type="button" class="pwd-toggle-btn" data-target="input-new-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #00F0FF; font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: 4px; z-index: 10;">보기</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="input-confirm-password">새 비밀번호 확인</label>
+                    <div style="position: relative; width: 100%;">
+                        <input type="password" id="input-confirm-password" class="form-input" placeholder="동일하게 한 번 더 입력하세요" required style="padding-right: 60px;">
+                        <button type="button" class="pwd-toggle-btn" data-target="input-confirm-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #00F0FF; font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: 4px; z-index: 10;">보기</button>
+                    </div>
+                </div>
+                <div class="action-bar">
+                    <button type="submit" class="btn-primary" id="btn-submit-password">비밀번호 변경 완료</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="settings-card">
+            <h2 class="card-headline">알림 및 환경 설정</h2>
+            <form id="form-update-notification-settings" novalidate>
+                <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0;">
+                    <div style="padding-right: 16px;">
+                        <label class="form-label" style="margin-bottom: 4px; color: #ffffff;">실시간 데스크톱 토스트 팝업</label>
+                        <span style="font-size: 0.8rem; color: #8A919E; line-height: 1.4; display: block;">새로운 워크스페이스 변경 피드가 인젝션될 때 화면 우측 상단에 실시간 토스트를 표시합니다.</span>
+                    </div>
+                    <input type="checkbox" id="checkbox-toast-toggle" checked style="width: 18px; height: 18px; accent-color: #00F0FF; cursor: pointer; flex-shrink: 0;">
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label class="form-label">데이터 세션 보관 정책</label>
+                    <input type="text" class="form-input field-readonly" readonly value="최근 30일 동안 수신된 실시간 인앱 알림 내역이 유저 클라우드 컨테이너에 동기화 보관됩니다.">
+                </div>
+                
+                <div class="action-bar">
+                    <button type="submit" class="btn-primary" id="btn-submit-noti-config">알림 설정 저장</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="settings-card zone-danger">
+            <h2 class="card-headline text-danger">위험 구역 (Danger Zone)</h2>
+            <p class="zone-warning-text">계정을 삭제하면 모든 클라우드 스케줄 데이터 및 커뮤니티 이력이 영구적으로 파기되며 복구가 불가능합니다.</p>
+            <div class="action-bar" style="justify-content: flex-start;">
+                <button type="button" class="btn-danger-action" id="btn-terminate-account">서비스 회원 탈퇴</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-layer" id="termination-modal">
+        <div class="modal-box" style="max-width: 420px; width: 90%;">
+            <h3 class="modal-title" style="color: #FF4B4B;">정말 회원 탈퇴하시겠습니까?</h3>
+            <p class="modal-desc" style="margin-bottom: 16px;">탈퇴 보안 인증을 위해 현재 로그인된 계정의 **이메일 주소**와 **비밀번호**를 정확히 입력해 주세요.</p>
+            
+            <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+                <label class="form-label" for="delete-confirm-email" style="font-size: 0.8rem; color: #8A919E;">현재 이메일 주소</label>
+                <input type="email" id="delete-confirm-email" class="form-input" placeholder="이메일 주소를 입력하세요" style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.15);">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px; text-align: left;">
+                <label class="form-label" for="delete-confirm-password" style="font-size: 0.8rem; color: #8A919E;">비밀번호 확인</label>
+                <div style="position: relative; width: 100%;">
+                    <input type="password" id="delete-confirm-password" class="form-input" placeholder="비밀번호를 입력하세요" style="background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.15); padding-right: 60px;">
+                    <button type="button" class="pwd-toggle-btn" data-target="delete-confirm-password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #00F0FF; font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: 4px; z-index: 10;">보기</button>
+                </div>
+            </div>
+
+            <div class="modal-footer-group">
+                <button type="button" class="btn-modal-close" id="btn-modal-cancel">취소</button>
+                <button type="button" class="btn-modal-danger-confirm" id="btn-modal-confirm-delete">위험을 인지했으며, 탈퇴 처리를 확정합니다</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-hub" id="toast-center-hub"></div>
+
+    <script type="module" src="../js/navbar.js?v=20260521"></script>
+    <script type="module" src="../js/notifications.js?v=20260521"></script>
+    <script type="module" src="../js/account.js?v=20260521"></script>
+</body>
+</html>
