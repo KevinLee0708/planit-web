@@ -1,4 +1,4 @@
-const KEYS = {
+export const KEYS = {
   apiKey: "AIzaSyCmMaEuZUFeO-WY5YKsGOBKOrzzv33HyjY",
   authDomain: "planit-space.firebaseapp.com",
   projectId: "planit-space",
