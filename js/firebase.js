@@ -6,16 +6,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 // 1. 🔥 Firestore 라이브러리 임포트 추가
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+import { KEYS } from "./config.js";
 // 본인의 파이어베이스 프로젝트 키값 세팅 대입 영역
-const firebaseConfig = {
-  apiKey: "AIzaSyCmMaEuZUFeO-WY5YKsGOBKOrzzv33HyjY",
-  authDomain: "planit-space.firebaseapp.com",
-  projectId: "planit-space",
-  storageBucket: "planit-space.firebasestorage.app",
-  messagingSenderId: "631345692627",
-  appId: "1:631345692627:web:54fcc4182889c4d5443926",
-  measurementId: "G-2ZMEYMMK36"
+export const firebaseConfig = {
+  apiKey: KEYS.apiKey,
+  authDomain: KEYS.authDomain,
+  projectId: KEYS.projectId,
+  storageBucket: KEYS.storageBucket,
+  messagingSenderId: KEYS.messagingSenderId,
+  appId: KEYS.appId,
+  measurementId: KEYS.measurementId
 };
 
 // 2. Firebase Core App 초기화
