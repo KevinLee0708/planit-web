@@ -1,0 +1,28 @@
+{
+  "name": "planit-web",
+  "version": "1.0.0",
+  "description": "Official website for Planit - your personal schedule dashboard",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KevinLee0708/planit-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KevinLee0708/planit-web/issues"
+  },
+  "homepage": "https://github.com/KevinLee0708/planit-web#readme",
+  "dependencies": {
+    "firebase": "^10.7.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

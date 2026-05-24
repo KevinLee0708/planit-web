@@ -6,16 +6,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 // 1. 🔥 Firestore 라이브러리 임포트 추가
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { KEYS } from "./config.js";
 // 본인의 파이어베이스 프로젝트 키값 세팅 대입 영역
-export const firebaseConfig = {
-  apiKey: KEYS.apiKey,
-  authDomain: KEYS.authDomain,
-  projectId: KEYS.projectId,
-  storageBucket: KEYS.storageBucket,
-  messagingSenderId: KEYS.messagingSenderId,
-  appId: KEYS.appId,
-  measurementId: KEYS.measurementId
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MESUREMENT_ID
 };
 
 // 2. Firebase Core App 초기화
