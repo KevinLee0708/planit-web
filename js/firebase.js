@@ -8,13 +8,13 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 // 본인의 파이어베이스 프로젝트 키값 세팅 대입 영역
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    apiKey: "AIzaSyCmMaEuZUFeO-WY5YKsGOBKOrzzv33HyjY",
+    authDomain: "planit-space.firebaseapp.com",
+    projectId: "planit-space",
+    storageBucket: "planit-space.firebasestorage.app",
+    messagingSenderId: "631345692627",
+    appId: "1:631345692627:web:54fcc4182889c4d5443926",
+    measurementId: "G-2ZMEYMMK36" // 오타 수정본
 };
 
 // 2. Firebase Core App 초기화
