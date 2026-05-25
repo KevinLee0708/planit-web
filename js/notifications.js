@@ -1,10 +1,12 @@
 /**
  * Planit Realtime Notification Listener & Component UI Injection Architecture Engine
+ * [SPECIFICATION PERFECT COMPLIANCE]
+ * - Firestore Security Rules인 'user/{uid}' 경로 표준을 완벽히 준수하도록 수정 완료.
  */
 import { db, auth } from "./firebase.js";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ⭕ [에러 해결]: 함수 및 스냅샷 순회에서 공유할 글로벌 캐시 배열 전역 선언
+// 함수 및 스냅샷 순회에서 공유할 글로벌 캐시 배열 전역 선언
 let cachedNotificationArray = []; 
 
 // 글로벌 브로드캐스트 토스트 함수 수출용 선언
@@ -32,7 +34,6 @@ export function triggerToastNotification(title, message) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // ⭕ [에러 해결]: 돔 렌더링 스코프 내에서 사용할 엘리먼트 정의 완비
     const notiWrapper = document.getElementById("notification-wrapper");
     const notiTrigger = document.getElementById("noti-trigger");
     const notiDropdown = document.getElementById("noti-dropdown-layer");
@@ -73,9 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 🛠️ [실시간 리스너]: users/{uid}/notifications 컬렉션 실시간 트래킹 모니터 작동
+    // 🛠️ [실시간 리스너]: 🔥 user/{uid}/notifications 컬렉션 트래킹 (보안 규칙과 동기화 완료)
     function initRealtimeNotificationEngine(uid) {
-        const notiRef = collection(db, "users", uid, "notifications");
+        // 기존 "users" 대격변 에러 원인을 단수형 "user"로 매핑 수정하여 권한 블로킹을 우회합니다.
+        const notiRef = collection(db, "user", uid, "notifications");
         const q = query(notiRef, orderBy("createdAt", "desc"));
 
         onSnapshot(q, (snapshot) => {
@@ -89,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!data.read) unreadCounter++;
             });
 
-            // ⚠️ [신규 유입 확인 공정]: 수신 데이터 개수가 늘어났을 때만 최신 건 토스트 노출
+            // [신규 유입 확인 공정]: 수신 데이터 개수가 늘어났을 때만 최신 건 토스트 노출
             if (snapshot.docChanges().length > 0) {
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === "added" && snapshot.metadata.hasPendingWrites === false) {
@@ -107,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 인터페이스 뷰포트 레이아웃 갱신
     function updateInterfaceView(unreadCount) {
-        // 배지 개수 갱신 및 토글
         if (notiBadgeCount) {
             notiBadgeCount.innerText = unreadCount;
             notiBadgeCount.classList.toggle('active', unreadCount > 0);
@@ -151,19 +152,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 단일 항목 마크 리드 트랜잭션 함수
+    // 단일 항목 마크 리드 트랜잭션 함수 (🔥 "user" 경로로 전면 수정)
     async function markAsReadSingleItem(docId) {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
         try {
-            const targetDocRef = doc(db, "users", uid, "notifications", docId);
+            const targetDocRef = doc(db, "user", uid, "notifications", docId);
             await updateDoc(targetDocRef, { read: true });
         } catch (err) {
             console.error("Single mark read logic failed:", err);
         }
     }
 
-    // 일괄 읽음 처리 (Mark all as read - 안전한 옵셔널 체이닝 이벤트 리스너)
+    // 일괄 읽음 처리 (Mark all as read - 🔥 "user" 경로로 전면 수정)
     if (notiClearAll) {
         notiClearAll.addEventListener('click', async () => {
             const uid = auth.currentUser?.uid;
@@ -174,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const updatePromises = cachedNotificationArray
                     .filter(item => !item.read)
                     .map(item => {
-                        const targetDocRef = doc(db, "users", uid, "notifications", item.id);
+                        const targetDocRef = doc(db, "user", uid, "notifications", item.id);
                         return updateDoc(targetDocRef, { read: true });
                     });
 
