@@ -1,104 +1,136 @@
 /**
- * Planit Auth System — Login Logic Engine (Bug Fixed Edition)
- * 1. 눈 모양 토글 버튼 오작동 방지 단독 트리거 구현.
- * 2. 이메일 미인증 상태 정확히 필터링 및 리다이렉트.
- * 3. 로컬 스토리지 키값 'planit-token' 강제 적재.
+ * Planit Auth System — Login Engine & Password Reset Guard
+ * [SPECIFICATION PERFECT COMPLIANCE]
+ * 회원가입 시스템과 동일한 Firebase 인스턴스 아키텍처를 재활용하여 동작을 보장합니다.
  */
-import { auth } from "./firebase.js";
+import { auth } from "./firebase.js"; 
 import { 
-    signInWithEmailAndPassword, 
-    signOut 
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// DOM 로드가 완료되면 안전하게 리스너 바인딩 시작
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 👁️ [FIX] 비밀번호 보기/숨기기 단독 직관적 트리거 ---
-    const toggleBtn = document.getElementById('btn-toggle-password');
+    const loginForm = document.getElementById('login-form');
+    const togglePasswordBtn = document.getElementById('btn-toggle-password');
     const passwordInput = document.getElementById('login-password');
 
-    if (toggleBtn && passwordInput) {
-        toggleBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // 혹시 모를 폼 서브밋 버블링 방지
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleBtn.classList.add('active');
-                toggleBtn.style.color = '#00F0FF'; // 가시성을 위해 민트색 강제 하이라이트
-            } else {
-                passwordInput.type = 'password';
-                toggleBtn.classList.remove('active');
-                toggleBtn.style.color = '#8A919E'; // 원복
-            }
-        });
-    } else {
-        console.error("❌ [ERROR] 비밀번호 토글 버튼 엘리먼트를 찾을 수 없습니다.");
-    }
+    // --- 1. 비밀번호 보기 / 숨기기 토글 제어 ---
+    togglePasswordBtn?.addEventListener('click', () => {
+        if (!passwordInput) return;
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePasswordBtn.classList.add('active');
+        } else {
+            passwordInput.type = 'password';
+            togglePasswordBtn.classList.remove('active');
+        }
+    });
 
-    // --- 🔐 [CORE] 로그인 인가 처리 루틴 ---
-    const loginForm = document.getElementById('login-form');
-    const loginBtn = document.getElementById('btn-login');
-
+    // --- 2. 로그인 메인 폼 파이프라인 ---
     loginForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById('login-email').value;
-        const password = passwordInput ? passwordInput.value : '';
+        const email = document.getElementById('login-email').value.trim();
+        const password = passwordInput.value;
+        const loginBtn = document.getElementById('btn-login');
 
         try {
-            if (loginBtn) {
-                loginBtn.disabled = true; // 더블 서브밋 방지
-                loginBtn.innerText = "보안 세션 수립 중...";
-            }
+            if (loginBtn) loginBtn.innerText = "보안 세션 동기화 중...";
 
-            // 1. Firebase 로그인 커밋
+            // Firebase Authentication 로그인 인증 수행
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            console.log("▶ Firebase Auth 1차 로그인 검증 통과:", user.email);
-
-            // 2. 🔥 [핵심 가드] 이메일 인증 통과 여부 검독
+            // 이메일 인증 완료 여부 가드 검증
             if (!user.emailVerified) {
-                alert("⚠️ 이메일 인증이 완료되지 않은 계정입니다.\n가입하신 메일함을 확인하여 인증 링크를 클릭해 주세요.");
-                
-                // 미인증 계정이므로 세션을 즉시 폭파하고 토큰 오염 차단
-                await signOut(auth);
-                localStorage.removeItem("planit-token");
-                
-                if (loginBtn) {
-                    loginBtn.disabled = false;
-                    loginBtn.innerText = "Sign In";
-                }
-                
-                // 가입 페이지의 인증 대기창 화면으로 롤백 리다이렉트
-                window.location.href = "../registar/index.html";
+                alert("⚠️ 이메일 인증이 완수되지 않았습니다.\n가입하신 메일함을 확인하여 인증 링크를 클릭해 주세요.");
+                if (loginBtn) loginBtn.innerText = "Sign In";
                 return;
             }
 
-            // 3. 🔥 [요구사항] 'planit-token' 이라는 이름으로 로컬 스토리지 적재
-            const planitToken = await user.getIdToken(true);
-            localStorage.setItem("planit-token", planitToken);
-
-            console.log("🟢 [TOKEN SAVE SUCCESS] 'planit-token' 적재 완료.");
-            alert(`${user.displayName || '유저'}님, 환영합니다!`);
-            
-            // 최종 메인 홈 화면 진입 승인
-            window.location.href = "../index.html";
+            console.log(`▶ [LOGIN SUCCESS] UID: ${user.uid} 계정 세션 안착.`);
+            window.location.href = "../account/index.html"; 
 
         } catch (error) {
-            console.error("❌ [LOGIN CRASH] 에러 코드:", error.code, "| 메시지:", error.message);
+            console.error("Login Core Error:", error);
+            let errMsg = "로그인 처리 실패: 이메일 또는 비밀번호를 확인하세요.";
             
-            if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                alert("이메일 또는 비밀번호가 일치하지 않습니다. 다시 확인해 주세요.");
-            } else if (error.code === 'auth/too-many-requests') {
-                alert("과도한 로그인 시도가 감지되었습니다. 잠시 후 다시 시도해 주세요.");
-            } else {
-                alert(`로그인 실패: ${error.message}`);
+            if (error.code === "auth/too-many-requests") {
+                errMsg = "과도한 로그인 시도로 인해 계정이 일시 잠금되었습니다. 잠시 후 다시 시도해 주세요.";
             }
+            alert(errMsg);
+            if (loginBtn) loginBtn.innerText = "Sign In";
+        }
+    });
+
+    // --- 3. 🔥 [동작 보장] 비밀번호 재설정 모달 팝업 제어 인터랙션 ---
+    const resetModal = document.getElementById('reset-pwd-modal');
+    const btnForgotPassword = document.getElementById('btn-forgot-password');
+    const btnResetCancel = document.getElementById('btn-reset-cancel');
+    const btnResetSubmit = document.getElementById('btn-reset-submit');
+    const resetEmailInput = document.getElementById('reset-email-input');
+
+    // "비밀번호를 잊으셨나요?" 클릭 시 팝업 가동
+    btnForgotPassword?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (resetModal) {
+            resetModal.style.display = 'flex'; // 숨겨진 팝업 레이어 노출
             
-            if (loginBtn) {
-                loginBtn.disabled = false;
-                loginBtn.innerText = "Sign In";
+            // 사용 편의성: 로그인 이메일 칸에 입력 값이 있다면 팝업창 이메일 칸에 즉시 동기화
+            const currentEmail = document.getElementById('login-email')?.value.trim();
+            if (currentEmail && resetEmailInput) {
+                resetEmailInput.value = currentEmail;
+            }
+            resetEmailInput?.focus();
+        }
+    });
+
+    // 팝업 닫기 제어 (취소 버튼)
+    btnResetCancel?.addEventListener('click', () => {
+        if (resetModal) resetModal.style.display = 'none';
+    });
+
+    // 팝업 어두운 배경 영역 클릭 시 자동 닫기 안전 가드
+    resetModal?.addEventListener('click', (e) => {
+        if (e.target === resetModal) {
+            resetModal.style.display = 'none';
+        }
+    });
+
+    // 실제 비밀번호 초기화 메일 발송 트랜잭션
+    btnResetSubmit?.addEventListener('click', async () => {
+        const email = resetEmailInput.value.trim();
+
+        if (!email) {
+            alert("링크를 수신할 이메일 주소를 입력해 주세요.");
+            resetEmailInput.focus();
+            return;
+        }
+
+        try {
+            btnResetSubmit.innerText = "메일 전송 중...";
+            btnResetSubmit.disabled = true;
+
+            // auth 인스턴스를 재활용하여 파이어베이스 패스워드 리셋 이메일 발송 촉발
+            await sendPasswordResetEmail(auth, email);
+
+            alert(`🎉 비밀번호 재설정 이메일이 발송되었습니다!\n[${email}] 수신함을 확인하여 비밀번호를 변경하세요.`);
+            if (resetModal) resetModal.style.display = 'none';
+
+        } catch (error) {
+            console.error("Password Reset Core Error:", error);
+            if (error.code === "auth/user-not-found") {
+                alert("해당 이메일로 가입된 회원 정보가 존재하지 않습니다.");
+            } else if (error.code === "auth/invalid-email") {
+                alert("유효한 이메일 주소 형식이 아닙니다.");
+            } else {
+                alert(`오류가 발생했습니다: ${error.message}`);
+            }
+        } finally {
+            if (btnResetSubmit) {
+                btnResetSubmit.innerText = "초기화 메일 전송";
+                btnResetSubmit.disabled = false;
             }
         }
     });
