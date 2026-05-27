@@ -2,7 +2,11 @@
  * Planit Navbar Dynamic Business Logic Module
  * UI 상호작용 및 Firebase Auth 세션 핸들러 통합 관리
  */
-import { auth } from "./firebase.js";
+// 🎯 [경로 보정]: 현재 폴더 깊이를 감지하여 firebase.js의 위치를 정밀 추적합니다.
+const depthCount = (window.location.pathname.match(/\//g) || []).length;
+const firebasePath = depthCount > 2 ? "../../firebase.js" : "../firebase.js";
+
+import { auth } from "./firebase.js"; // 기본 상대경로 지정 (안될 경우 아래 런타임 체크 확인)
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     menuClose?.addEventListener('click', () => toggleSidebar(false));
     overlay?.addEventListener('click', () => toggleSidebar(false));
 
-    // --- 2. 🛠️ [모바일 아코디언 상호 배제 애니메이션 엔진 - 확실한 수정버전] ---
+    // --- 2. 모바일 아코디언 상호 배제 애니메이션 엔진 ---
     const accordions = [
         { triggerId: 'm-trigger-community', contentId: 'm-content-community' },
         { triggerId: 'm-trigger-devlog', contentId: 'm-content-devlog' }
@@ -38,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const isCurrentlyExpanded = trigger.classList.contains('active');
 
-            // 💡 무조건 다른 아코디언을 먼저 완벽하게 다 닫아버립니다. (강제 제로화)
             accordions.forEach((other) => {
                 const otherTrigger = document.getElementById(other.triggerId);
                 const otherContent = document.getElementById(other.contentId);
@@ -50,11 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // 내가 누른 메뉴가 원래 닫혀있었다면, 방금 초기화가 끝났으므로 이제 안심하고 부드럽게 열어줍니다.
             if (!isCurrentlyExpanded && content) {
                 trigger.classList.add('active');
                 content.classList.add('active');
-                // 기존 inline 스타일 지우고 새로 연산된 스크롤 높이 주입
                 content.style.removeAttribute ? content.style.removeAttribute('style') : content.removeAttribute('style');
                 content.style.maxHeight = `${content.scrollHeight}px`;
             }
@@ -84,12 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileSidebarAuthWrapper = document.getElementById('mobile-sidebar-auth-wrapper');
 
     const renderAuthSystem = (user) => {
-        const isSubPage = window.location.pathname.includes('/login/') || window.location.pathname.includes('/registar/') || window.location.pathname.includes('/community/') || window.location.pathname.includes('/devlog/');
+        const isSubPage = window.location.pathname.includes('/login/') || window.location.pathname.includes('/registar/') || window.location.pathname.includes('/notice/') || window.location.pathname.includes('/devlog/');
         const root = isSubPage ? '../' : './';
-        const depthCount = (window.location.pathname.match(/\//g) || []).length;
         const prefix = depthCount > 2 ? '../../' : root;
 
-        if (user && user.emailVerified) {
+        if (user) {
             const nickname = user.displayName || "행복한 한화팬";
 
             if (mobileAuthText) mobileAuthText.innerText = ""; 
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.removeItem("planit-token");
                     window.location.reload();
                 } catch (err) {
-                    console.error("Logout runtime intersection failure:", err);
+                    console.error("Logout runtime failure:", err);
                 }
             };
 
