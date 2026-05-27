@@ -1,10 +1,11 @@
 /**
  * Planit Realtime Notification Listener & Component UI Injection Architecture Engine
  */
-import { db, auth } from "./firebase.js"; // 🎯 [경로 보정]: 공통 js 폴더 위치 기준으로 상위 매핑 확인
+import { db, auth } from "./firebase.js"; // 🎯 공통 js 폴더 위치 기준 상위 매핑 확인
 import { collection, query, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 let cachedNotificationArray = []; 
+let isInitialLoad = true; // 🎯 [과거 알림 와르르 폭탄 방지 플래그]
 
 export function triggerToastNotification(title, message) {
     const hub = document.getElementById('toast-center-hub');
@@ -13,8 +14,8 @@ export function triggerToastNotification(title, message) {
     const unit = document.createElement('div');
     unit.className = 'toast-unit';
     unit.innerHTML = `
-        <div class="toast-head">${title}</div>
-        <div class="toast-body">${message}</div>
+        <div class="toast-head" style="font-weight: 700; color: #00F0FF; font-size: 0.85rem;">${title}</div>
+        <div class="toast-body" style="color: #fff; font-size: 0.8rem; margin-top: 2px;">${message}</div>
     `;
     hub.appendChild(unit);
 
@@ -34,12 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const notiClearAll = document.getElementById("noti-clear-all");
 
     if (notiTrigger && notiDropdown) {
-        notiTrigger.style.cursor = "pointer"; // 마우스 호버 시 포인터 강제 부여
+        notiTrigger.style.cursor = "pointer";
         
         notiTrigger.addEventListener("click", (e) => {
             e.stopPropagation();
-            
-            // 🎯 [토글 버그 완벽 제어]: 계산된 스타일을 읽어와서 토글 처리 안전성 보장
             const currentDisplay = window.getComputedStyle(notiDropdown).display;
             if (currentDisplay === "none") {
                 notiDropdown.style.setProperty("display", "block", "important");
@@ -80,15 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!data.read) unreadCounter++;
             });
 
+            // 🎯 실시간 새로 들어온 알림만 피킹 (hasPendingWrites 가드 결합)
             if (snapshot.docChanges().length > 0) {
                 snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added" && snapshot.metadata.hasPendingWrites === false) {
-                        const newAlert = change.doc.data();
-                        triggerToastNotification(newAlert.title || "새 알림", newAlert.message || "");
+                    if (change.type === "added" && !snapshot.metadata.hasPendingWrites) {
+                        if (!isInitialLoad) { // 첫 로드가 끝난 상태의 순수 신규 알림만 토스트 팝업 생성
+                            const newAlert = change.doc.data();
+                            triggerToastNotification(newAlert.title || "새 알림", newAlert.message || "");
+                        }
                     }
                 });
             }
 
+            isInitialLoad = false; // 첫 리스너 갱신 완료 처리
             updateInterfaceView(unreadCounter);
         }, (error) => {
             console.error("Firestore sync blocked:", error);
@@ -143,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const targetDocRef = doc(db, "user", uid, "notifications", docId);
             await updateDoc(targetDocRef, { read: true });
         } catch (err) {
-            console.error(err);
+            console.error("알림 단건 읽음 처리 실패:", err);
         }
     }
 
@@ -153,19 +156,18 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!uid || cachedNotificationArray.length === 0) return;
 
             try {
-                const updatePromises = cachedNotificationArray
-                    .filter(item => !item.read)
-                    .map(item => {
-                        const targetDocRef = doc(db, "user", uid, "notifications", item.id);
-                        return updateDoc(targetDocRef, { read: true });
-                    });
+                const unreadItems = cachedNotificationArray.filter(item => !item.read);
+                if (unreadItems.length === 0) return;
 
-                if (updatePromises.length > 0) {
-                    await Promise.all(updatePromises);
-                }
+                const updatePromises = unreadItems.map(item => {
+                    const targetDocRef = doc(db, "user", uid, "notifications", item.id);
+                    return updateDoc(targetDocRef, { read: true });
+                });
+
+                await Promise.all(updatePromises);
                 triggerToastNotification("일괄 완료", "모든 알림을 읽음 처리했습니다.");
             } catch (err) {
-                console.error(err);
+                console.error("일괄 읽음 처리 실패:", err);
             }
         });
     }

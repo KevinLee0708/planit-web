@@ -2,15 +2,14 @@
  * Planit Navbar Dynamic Business Logic Module
  * UI 상호작용 및 Firebase Auth 세션 핸들러 통합 관리
  */
-// 🎯 [경로 보정]: 현재 폴더 깊이를 감지하여 firebase.js의 위치를 정밀 추적합니다.
-const depthCount = (window.location.pathname.match(/\//g) || []).length;
-const firebasePath = depthCount > 2 ? "../../firebase.js" : "../firebase.js";
-
-import { auth } from "./firebase.js"; // 기본 상대경로 지정 (안될 경우 아래 런타임 체크 확인)
+import { auth } from "./firebase.js"; // 🎯 ESM 명세에 따른 일관된 상대 임포트 유지
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     
+    // --- 0. 현재 도메인 뎁스 계산 엔진 및 하위 호환성 패치 ---
+    const depthCount = (window.location.pathname.match(/\//g) || []).length;
+
     // --- 1. 모바일 드로어 사이드바 캐싱 및 상태 정의 ---
     const menuToggle = document.getElementById('menu-toggle');
     const menuClose = document.getElementById('menu-close');
@@ -56,7 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isCurrentlyExpanded && content) {
                 trigger.classList.add('active');
                 content.classList.add('active');
-                content.style.removeAttribute ? content.style.removeAttribute('style') : content.removeAttribute('style');
+                if (content.style.removeAttribute) {
+                    content.style.removeAttribute('style');
+                } else {
+                    content.removeAttribute('style');
+                }
                 content.style.maxHeight = `${content.scrollHeight}px`;
             }
         });

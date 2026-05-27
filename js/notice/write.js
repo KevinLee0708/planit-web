@@ -18,14 +18,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     auth.onAuthStateChanged(async (user) => {
         if (!user) {
             alert("로그인 정보가 필요합니다.");
-            window.location.href = "/account/";
+            window.location.href = "../../account/"; // 🎯 write 폴더 깊이에 맞춘 상대경로 보정
             return;
         }
         const userDoc = await getDoc(doc(db, "user", user.uid));
         if (!["staff", "admin", "owner"].includes(userDoc.data()?.role)) {
             alert("⚠️ 접근 권한이 없습니다.");
-            // 🎯 [교정] 권한 없을 때 notice 목록(상위 폴더)으로 안전하게 튕기기
-            window.location.href = "../";
+            window.location.href = "../"; // 🎯 notice 목록(상위 폴더)으로 복귀
         }
     });
 
@@ -52,7 +51,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             } else {
                 alert("존재하지 않거나 파기된 공지사항입니다.");
-                // 🎯 [교정] 문서 없을 때 notice 목록(상위 폴더)으로 복귀
                 window.location.href = "../";
             }
         } catch (err) {
@@ -78,6 +76,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
             const user = auth.currentUser;
+            if (!user) {
+                alert("인증 세션이 만료되었습니다. 다시 로그인해주세요.");
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+            
             const userDoc = await getDoc(doc(db, "user", user.uid));
             const userData = userDoc.data();
 
@@ -93,9 +97,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }, { merge: true });
 
                 alert("공지사항이 성공적으로 수정되었습니다.");
-                
-                // 🎯 [404 해결 픽스] 상대 경로(../)를 활용해 /community/notice/detail/ 구조로 정확하게 안착시킵니다.
-                window.location.href = `../detail/?id=${editId}`;
+                window.location.href = `../detail/?id=${editId}`; // 🎯 /notice/write/ -> /notice/detail/ 이동
 
             } else {
                 // 📝 신규 등록 처리 분기
@@ -104,7 +106,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const snap = await getDocs(q);
                 
                 let nextId = 1;
-                if (!snap.empty) nextId = snap.docs[0].data().id + 1;
+                if (!snap.empty) {
+                    const maxId = snap.docs[0].data().id;
+                    nextId = Number(maxId) ? maxId + 1 : 1;
+                }
 
                 await setDoc(doc(db, "notices", String(nextId)), {
                     id: nextId,
@@ -118,9 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 alert("공지사항이 안전하게 등록되었습니다.");
-                
-                // 🎯 [404 해결 픽스] 상위 폴더인 /community/notice/ 목록으로 깔끔하게 이동
-                window.location.href = "../";
+                window.location.href = "../"; // 🎯 /notice/write/ -> /notice/ 목록으로 복귀
             }
         } catch (err) {
             console.error(err);

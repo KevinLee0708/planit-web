@@ -2,7 +2,7 @@ import { db, auth } from "../firebase.js"; // 📌 상위 폴더의 firebase.js 
 import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // 🎯 형님의 실제 디렉토리 구조인 /community/notice/detail/ 경로를 정확하게 추적
+    // 🎯 경로 체크 시스템 정밀화
     const isDetailPage = window.location.pathname.includes("/notice/detail/");
 
     if (!isDetailPage) {
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="col-views">${notice.views || 0}</div>
                 `;
                 
-                // 🎯 [교정]: 실제 상세페이지 폴더 구조 경로 매핑
+                // 🎯 목록(/notice/)에서 상세(/notice/detail/)로 이동하는 상대경로 매핑
                 li.addEventListener("click", () => {
                     window.location.href = `./detail/?id=${notice.id}`;
                 });
@@ -94,23 +94,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             const data = snap.data();
             document.title = `Planit - ${data.title}`;
 
-            // 조회수 1 증가
-            await updateDoc(docRef, { views: increment(1) });
-
-            // DOM 바인딩
+            // 렌더링 동기화 후 DB 카운트 가산 구조로 리팩토링 (트래픽 중복 가산 제어)
             document.getElementById("view-title").innerText = data.title;
             document.getElementById("view-author").innerText = data.author;
-            document.getElementById("view-count").innerText = `조회수 ${data.views + 1}`;
+            document.getElementById("view-count").innerText = `조회수 ${data.views || 0}`;
             document.getElementById("view-content").innerHTML = data.content;
             
             if (data.important) {
-                document.getElementById("badge-target").innerHTML = `<span class="badge-important">중요</span>`;
+                const badgeTarget = document.getElementById("badge-target");
+                if (badgeTarget) badgeTarget.innerHTML = `<span class="badge-important">중요</span>`;
             }
 
             const dateStr = data.createdAt?.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : "방금 전";
             document.getElementById("view-date").innerText = dateStr;
 
-            // 🛠️ 수정/삭제 버튼 인젝션 엔진
+            // 백엔드 어싱크 조회수 업데이트 진행
+            await updateDoc(docRef, { views: increment(1) });
+
+            // 🛠️ 어드민 컨트롤러 안전 결합 파이프
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     const userDoc = await getDoc(doc(db, "user", user.uid));
@@ -129,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             <button type="button" id="btn-notice-delete" style="padding: 10px 20px; background: transparent; color: #FF4B4B; border: 1px solid #FF4B4B; border-radius: 6px; font-weight: 700; cursor: pointer;">삭제하기</button>
                         `;
 
-                        // 🎯 [교정]: 상대 경로를 활용하여 공용 폼인 write 폴더로 정확하게 연결
+                        // 🎯 상세 페이지(/notice/detail/)에서 작성 폼(/notice/write/)으로 전환하는 브릿지 연산
                         document.getElementById("btn-notice-edit")?.addEventListener("click", () => {
                             window.location.href = `../write/?edit=${idParam}`;
                         });
@@ -152,34 +153,46 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
 
             // 체인 내비게이션 엔진 구동
-            loadNavLinks(data.id);
+            await loadNavLinks(data.id);
         } catch (e) {
             console.error(e);
         }
 
         async function loadNavLinks(currentId) {
-            const q = query(collection(db, "notices"), orderBy("id", "asc"));
-            const snap = await getDocs(q);
-            let list = [];
-            snap.forEach(d => list.push(d.data()));
-            const index = list.findIndex(item => item.id === Number(currentId));
+            try {
+                const q = query(collection(db, "notices"), orderBy("id", "asc"));
+                const snap = await getDocs(q);
+                let list = [];
+                snap.forEach(d => list.push(d.data()));
+                
+                const index = list.findIndex(item => Number(item.id) === Number(currentId));
 
-            // 🎯 [교정 완료]: 하이재킹 에러를 일으키던 /detail/ 주소를 현재 경로인 ../detail/ 로 안전하게 치환
-            if (index > 0) {
-                const prev = list[index - 1];
-                document.getElementById("prev-link").innerText = prev.title;
-                document.getElementById("row-prev").style.cursor = "pointer";
-                document.getElementById("row-prev").addEventListener("click", () => {
-                    window.location.href = `../detail/?id=${prev.id}`;
-                });
-            }
-            if (index < list.length - 1 && index !== -1) {
-                const next = list[index + 1];
-                document.getElementById("next-link").innerText = next.title;
-                document.getElementById("row-next").style.cursor = "pointer";
-                document.getElementById("row-next").addEventListener("click", () => {
-                    window.location.href = `../detail/?id=${next.id}`;
-                });
+                // 🎯 이전글/다음글 클릭 시 동일 뎁스 디렉토리 세션(?id=) 안에서 루프 돌도록 안전 치환
+                if (index > 0) {
+                    const prev = list[index - 1];
+                    document.getElementById("prev-link").innerText = prev.title;
+                    const rowPrev = document.getElementById("row-prev");
+                    rowPrev.style.cursor = "pointer";
+                    rowPrev.onclick = () => { window.location.href = `?id=${prev.id}`; };
+                } else {
+                    document.getElementById("prev-link").innerText = "이전 글이 없습니다.";
+                    document.getElementById("row-prev").style.cursor = "default";
+                    document.getElementById("row-prev").onclick = null;
+                }
+                
+                if (index < list.length - 1 && index !== -1) {
+                    const next = list[index + 1];
+                    document.getElementById("next-link").innerText = next.title;
+                    const rowNext = document.getElementById("row-next");
+                    rowNext.style.cursor = "pointer";
+                    rowNext.onclick = () => { window.location.href = `?id=${next.id}`; };
+                } else {
+                    document.getElementById("next-link").innerText = "다음 글이 없습니다.";
+                    document.getElementById("row-next").style.cursor = "default";
+                    document.getElementById("row-next").onclick = null;
+                }
+            } catch (err) {
+                console.error("네비게이션 로드 실패:", err);
             }
         }
     }
