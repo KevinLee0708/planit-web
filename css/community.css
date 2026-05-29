@@ -80,8 +80,14 @@ body {
     font-size: 0.9rem;
     display: none; /* JS 권한 체크 전 기본 숨김 */
     transition: background 0.2s;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 .btn-primary:hover { background: #e1e4ea; }
+.btn-primary .btn-icon { display: none; } /* 데스크톱에서는 아이콘 숨김 */
 
 .search-bar-wrapper {
     margin-bottom: 20px;
@@ -160,6 +166,7 @@ body {
     border: 1px solid var(--border-subtle);
     border-radius: 16px;
     padding: 40px;
+    pointer-events: auto !important; /* 모바일 터치 씹힘 방지 */
 }
 .view-header {
     border-bottom: 1px solid var(--border-subtle);
@@ -236,10 +243,65 @@ body {
 .btn-secondary { background: rgba(255, 255, 255, 0.05); color: #fff; }
 
 /* ==========================================
-   5. 모바일 반응형 안정화 (Responsive)
+   5. 모바일 반응형 안정화 및 구조 동기화 (Responsive)
    ========================================== */
 @media (max-width: 768px) {
-    .saas-container { margin: 40px auto; padding: 0 16px; }
+    .saas-container { 
+        margin: 40px auto; 
+        padding: 0 16px; 
+    }
+    
+    /* 타이틀 구역 가로 정렬 수복 및 높이 튀는 버그 해결 */
+    .saas-header {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding-bottom: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .saas-title { 
+        font-size: 1.6rem; 
+        margin: 0 0 6px 0;
+    }
+    .saas-subtitle {
+        font-size: 0.85rem;
+    }
+
+    /* ★ [수복] 모바일 전용 플러스(+) 버튼 원형 규격 연동 */
+    .btn-primary {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+        
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: #ffffff !important;
+        color: #0b0f17 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        
+        display: inline-flex !important;
+    }
+    
+    /* 모바일 텍스트 가림 및 아이콘 중앙 출력 */
+    .btn-primary .btn-text {
+        display: none !important;
+    }
+    .btn-primary .btn-icon {
+        display: block !important;
+        width: 20px !important;
+        height: 20px !important;
+        color: #0b0f17 !important;
+    }
+
     .table-header, .col-author, .col-views { display: none; }
     .notice-row { flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px; }
     .col-date { font-size: 0.8rem; }
@@ -250,4 +312,92 @@ body {
     .nav-row { padding: 14px 16px; }
     
     .glass-form { padding: 20px; }
+}
+
+/* ==========================================
+   6. 본문 하이퍼링크 자동 감지 전용 스타일 컴포넌트
+   ========================================== */
+#view-content {
+    position: relative !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+}
+
+/* 🎯 일반 글자처럼 인식되어 줄바꿈이 깨지는 걸 막는 inline 보정 및 링크 스타일 */
+#view-content a {
+    position: relative !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    
+    color: #00F0FF !important; /* 가독성 높은 미래지향적 블루 하이라이트 */
+    text-decoration: underline !important;
+    display: inline !important; /* 줄바꿈 텍스트 흐름 깨짐 원천 방지 */
+    word-break: break-all !important; /* 너무 긴 URL이 화면 밖으로 가출하는 것 차단 */
+}
+/* ==========================================
+   7. 존재하지 않는 공지사항 (404 Error Component)
+   ========================================== */
+.error-404-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    animation: saasFadeIn 0.4s ease-in-out;
+}
+
+.error-404-icon {
+    color: #FF4B4B; /* 경고 느낌의 네온 레드 */
+    margin-bottom: 20px;
+    animation: pulseError 2s infinite ease-in-out;
+}
+
+.error-404-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 12px 0;
+    letter-spacing: -0.02em;
+}
+
+.error-404-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 0 28px 0;
+}
+
+/* 목록 돌아가기 강조 버튼 */
+.btn-error-home {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 240, 255, 0.06);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    color: #00F0FF;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-error-home:hover {
+    background: #00F0FF;
+    color: #0b0f17;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* 아이콘 부드럽게 깜빡이는 애니메이션 효과 */
+@keyframes pulseError {
+    0% { opacity: 0.6; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1.02); }
+    100% { opacity: 0.6; transform: scale(0.98); }
 }

@@ -3,34 +3,47 @@ import { doc, getDoc, collection, setDoc, query, orderBy, limit, getDocs } from 
 
 document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("write-form");
+    const editorContainer = document.getElementById("editor-container");
     
+    // 🎯 글쓰기 전용 엘리먼트가 없으면 즉시 탈출 (다른 페이지에서 에러 터지는 것 방지)
+    if (!form || !editorContainer) return;
+
     const urlParams = new URLSearchParams(window.location.search);
     const editId = urlParams.get("edit");
     const isEditMode = !!editId;
 
+    // 🛠️ 툴바 옵션에 'link' 버튼을 확실하게 추가했습니다.
     const quill = new Quill('#editor-container', {
         theme: 'snow',
         placeholder: '공지사항 본문을 입력하세요.',
-        modules: { toolbar: [[{ 'size': ['small', false, 'large'] }], ['bold', 'italic', 'underline'], [{ 'color': [] }], ['clean']] }
+        modules: { 
+            toolbar: [
+                [{ 'size': ['small', false, 'large'] }], 
+                ['bold', 'italic', 'underline'], 
+                [{ 'color': [] }], 
+                ['link'], // 🎯 여기에 링크 버튼(사슬 모양 아이콘)이 생성됩니다!
+                ['clean']
+            ] 
+        }
     });
 
     // 1. 보안 가드 런타임
     auth.onAuthStateChanged(async (user) => {
         if (!user) {
             alert("로그인 정보가 필요합니다.");
-            window.location.href = "../../account/"; // 🎯 write 폴더 깊이에 맞춘 상대경로 보정
+            window.location.href = "../../account/"; 
             return;
         }
         const userDoc = await getDoc(doc(db, "user", user.uid));
         if (!["staff", "admin", "owner"].includes(userDoc.data()?.role)) {
             alert("⚠️ 접근 권한이 없습니다.");
-            window.location.href = "../"; // 🎯 notice 목록(상위 폴더)으로 복귀
+            window.location.href = "../"; 
         }
     });
 
     // 2. 🔄 수정 모드 데이터 복원 바인딩
     if (isEditMode) {
-        const submitBtn = form?.querySelector("button[type='submit']");
+        const submitBtn = form.querySelector("button[type='submit']");
         if (submitBtn) submitBtn.innerText = "공지사항 수정완료";
         
         const mainTitle = document.querySelector(".write-title");
@@ -43,8 +56,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (noticeSnap.exists()) {
                 const noticeData = noticeSnap.data();
                 
-                document.getElementById("field-title").value = noticeData.title || "";
-                document.getElementById("field-important").checked = !!noticeData.important;
+                const fieldTitle = document.getElementById("field-title");
+                const fieldImportant = document.getElementById("field-important");
+
+                if (fieldTitle) fieldTitle.value = noticeData.title || "";
+                if (fieldImportant) fieldImportant.checked = !!noticeData.important;
                 
                 if (noticeData.content) {
                     quill.root.innerHTML = noticeData.content;
@@ -59,12 +75,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // 3. 서브밋 파이프라인
-    form?.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const title = document.getElementById("field-title").value.trim();
+        const titleField = document.getElementById("field-title");
+        const importantField = document.getElementById("field-important");
+
+        const title = titleField ? titleField.value.trim() : "";
         const content = quill.root.innerHTML;
         const textLength = quill.getText().trim().length;
-        const important = document.getElementById("field-important").checked;
+        const important = importantField ? importantField.checked : false;
 
         if (!title || textLength === 0) { 
             alert("제목과 내용을 모두 기입해 주세요."); 
@@ -86,7 +105,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const userData = userDoc.data();
 
             if (isEditMode) {
-                // 🛠️ 수정 처리 분기
                 const targetDocRef = doc(db, "notices", editId);
                 
                 await setDoc(targetDocRef, {
@@ -97,10 +115,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }, { merge: true });
 
                 alert("공지사항이 성공적으로 수정되었습니다.");
-                window.location.href = `../detail/?id=${editId}`; // 🎯 /notice/write/ -> /notice/detail/ 이동
+                window.location.href = `../detail/?id=${editId}`; 
 
             } else {
-                // 📝 신규 등록 처리 분기
                 const noticesRef = collection(db, "notices");
                 const q = query(noticesRef, orderBy("id", "desc"), limit(1));
                 const snap = await getDocs(q);
@@ -123,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 alert("공지사항이 안전하게 등록되었습니다.");
-                window.location.href = "../"; // 🎯 /notice/write/ -> /notice/ 목록으로 복귀
+                window.location.href = "../"; 
             }
         } catch (err) {
             console.error(err);
